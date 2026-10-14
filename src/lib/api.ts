@@ -60,8 +60,8 @@ export interface ReviewBody {
   post_id: string;
   action: "approve" | "revise" | "reject";
   feedback?: string;
-  assignee_email?: string;
-  due_date?: string;
+  assignee_email?: string | undefined;
+  due_date?: string | undefined;
 }
 export function reviewPost(body: ReviewBody) {
   return request<{ ok: boolean; status: string }>("/content-review", {
