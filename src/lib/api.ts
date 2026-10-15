@@ -1,4 +1,4 @@
-export const API_BASE = "https://divverse-community.app.n8n.cloud/webhook";
+import { n8nProxy } from "./n8n.functions";
 
 export type Category = "win" | "build" | "why_us" | "event" | "job_posting" | "testimonial";
 export type ContentType = "image" | "short_form_video" | "marketing_video" | "carousel" | "video_script";
@@ -25,33 +25,32 @@ export interface Post {
   ping_count?: number | null;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  let res: Response;
+type Endpoint = "content-posts" | "content-review" | "content-ingest";
+
+async function request<T>(
+  endpoint: Endpoint,
+  opts: { method?: "GET" | "POST"; query?: Record<string, string> | undefined; body?: unknown } = {},
+): Promise<T> {
+  let r: { ok: boolean; status: number; text: string };
   try {
-    res = await fetch(`${API_BASE}${path}`, {
-      mode: "cors",
-      ...init,
-      headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
-    });
-  } catch {
-    throw new Error("Couldn't reach the content server. Check your connection and try again.");
+    r = await n8nProxy({ data: { endpoint, method: opts.method ?? "GET", query: opts.query, body: opts.body } });
+  } catch (e) {
+    throw new Error(e instanceof Error ? e.message : "Couldn't reach the content server. Try again.");
   }
-  const text = await res.text();
   let data: unknown = null;
   try {
-    data = text ? JSON.parse(text) : null;
+    data = r.text ? JSON.parse(r.text) : null;
   } catch {
     data = null;
   }
-  if (!res.ok) {
-    throw new Error(`Server responded with ${res.status}${text ? `: ${text.slice(0, 160)}` : ""}`);
-  }
+  if (!r.ok) throw new Error(`Server responded with ${r.status}${r.text ? `: ${r.text.slice(0, 160)}` : ""}`);
   return data as T;
 }
 
 export async function fetchPosts(status?: PostStatus): Promise<Post[]> {
-  const q = status ? `?status=${status}` : "";
-  const data = await request<{ posts?: Post[] } | Post[] | null>(`/content-posts${q}`);
+  const data = await request<{ posts?: Post[] } | Post[] | null>("content-posts", {
+    query: status ? { status } : undefined,
+  });
   if (Array.isArray(data)) return data;
   return data?.posts ?? [];
 }
@@ -64,10 +63,7 @@ export interface ReviewBody {
   due_date?: string | undefined;
 }
 export function reviewPost(body: ReviewBody) {
-  return request<{ ok: boolean; status: string }>("/content-review", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+  return request<{ ok: boolean; status: string }>("content-review", { method: "POST", body });
 }
 
 export interface IngestBody {
@@ -78,10 +74,7 @@ export interface IngestBody {
   consent_ok: boolean;
 }
 export function ingestSource(body: IngestBody) {
-  return request<{ ok: boolean; source_row_id: string }>("/content-ingest", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+  return request<{ ok: boolean; source_row_id: string }>("content-ingest", { method: "POST", body });
 }
 
 export const label = (s?: string | null) => (s ? s.replace(/_/g, " ") : "—");

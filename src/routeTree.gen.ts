@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AddSourceRouteImport } from './routes/add-source'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ProductionRouteImport } from './routes/production'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const AddSourceRoute = AddSourceRouteImport.update({
   path: '/add-source',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductionRoute = ProductionRouteImport.update({
   id: '/production',
   path: '/production',
@@ -32,30 +38,34 @@ const ProductionRoute = ProductionRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/add-source': typeof AddSourceRoute
+  '/admin': typeof AdminRoute
   '/production': typeof ProductionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-source': typeof AddSourceRoute
+  '/admin': typeof AdminRoute
   '/production': typeof ProductionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/add-source': typeof AddSourceRoute
+  '/admin': typeof AdminRoute
   '/production': typeof ProductionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/add-source' | '/production'
+  fullPaths: '/' | '/add-source' | '/admin' | '/production'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/add-source' | '/production'
-  id: '__root__' | '/' | '/add-source' | '/production'
+  to: '/' | '/add-source' | '/admin' | '/production'
+  id: '__root__' | '/' | '/add-source' | '/admin' | '/production'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddSourceRoute: typeof AddSourceRoute
+  AdminRoute: typeof AdminRoute
   ProductionRoute: typeof ProductionRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AddSourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/production': {
       id: '/production'
       path: '/production'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddSourceRoute: AddSourceRoute,
+  AdminRoute: AdminRoute,
   ProductionRoute: ProductionRoute,
 }
 export const routeTree = rootRouteImport
