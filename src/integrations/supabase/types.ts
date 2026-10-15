@@ -14,13 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      allowed_users: {
+        Row: {
+          created_at: string
+          email: string
+          invited_by: string | null
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          invited_by?: string | null
+          role?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          invited_by?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          role: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          role?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          role?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: { _uid: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
