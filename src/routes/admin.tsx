@@ -53,7 +53,7 @@ function Admin() {
     e.preventDefault();
     setBusy(true);
     const { error } = await supabase.from("allowed_users").insert({
-      email: email.trim().toLowerCase(), role, invited_by: session?.user.id,
+      email: email.trim().toLowerCase(), role, invited_by: session?.user.id ?? null,
     });
     setBusy(false);
     if (error) { toast.error(error.code === "23505" ? "That email is already invited" : error.message); return; }
