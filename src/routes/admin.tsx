@@ -41,8 +41,8 @@ function Admin() {
         supabase.from("profiles").select("email"),
       ]);
       if (a.error) throw a.error;
-      const joined = new Set((p.data ?? []).map((x) => x.email));
-      return (a.data ?? []).map((u) => ({ ...u, signedUp: joined.has(u.email) }));
+      const joined = new Set((p.data ?? []).map((x: { email: string | null }) => x.email));
+      return (a.data ?? []).map((u: { email: string; role: string; created_at: string }) => ({ ...u, signedUp: joined.has(u.email) }));
     },
   });
 
@@ -56,7 +56,7 @@ function Admin() {
       email: email.trim().toLowerCase(), role, invited_by: session?.user.id,
     });
     setBusy(false);
-    if (error) return toast.error(error.code === "23505" ? "That email is already invited" : error.message);
+    if (error) { toast.error(error.code === "23505" ? "That email is already invited" : error.message); return; }
     toast.success("Invited", { description: "They can now set their password on the sign-in page." });
     setEmail("");
     qc.invalidateQueries({ queryKey: ["allowed_users"] });

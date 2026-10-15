@@ -29,7 +29,7 @@ type Endpoint = "content-posts" | "content-review" | "content-ingest";
 
 async function request<T>(
   endpoint: Endpoint,
-  opts: { method?: "GET" | "POST"; query?: Record<string, string>; body?: unknown } = {},
+  opts: { method?: "GET" | "POST"; query?: Record<string, string> | undefined; body?: unknown } = {},
 ): Promise<T> {
   let r: { ok: boolean; status: number; text: string };
   try {

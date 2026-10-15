@@ -8,7 +8,7 @@ type Endpoint = (typeof ENDPOINTS)[number];
 interface ProxyInput {
   endpoint: Endpoint;
   method: "GET" | "POST";
-  query?: Record<string, string>;
+  query?: Record<string, string> | undefined;
   body?: unknown;
 }
 
@@ -20,14 +20,15 @@ export const n8nProxy = createServerFn({ method: "POST" })
     return d;
   })
   .handler(async ({ data }) => {
-    const key = process.env.N8N_API_KEY;
+    const key = process.env["N8N_API_KEY"];
     if (!key) throw new Error("Server is missing N8N_API_KEY");
     const qs = data.query ? `?${new URLSearchParams(data.query).toString()}` : "";
-    const res = await fetch(`${BASE}/${data.endpoint}${qs}`, {
+    const init: RequestInit = {
       method: data.method,
       headers: { "Content-Type": "application/json", "x-api-key": key },
-      body: data.method === "POST" ? JSON.stringify(data.body ?? {}) : undefined,
-    });
+    };
+    if (data.method === "POST") init.body = JSON.stringify(data.body ?? {});
+    const res = await fetch(`${BASE}/${data.endpoint}${qs}`, init);
     const text = await res.text();
     return { ok: res.ok, status: res.status, text };
   });
