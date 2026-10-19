@@ -33,14 +33,13 @@ function AuthForm() {
       if (error) setError(error.message);
       else qc.clear();
     } else {
-      const { data, error } = await supabase.auth.signUp({ email: em, password, options: { emailRedirectTo: window.location.origin } });
+      const { error } = await supabase.auth.signUp({ email: em, password });
       if (error) {
         setError(/database error|not_invited|saving new user/i.test(error.message)
           ? "This email hasn't been invited. Ask your admin for access."
           : error.message);
-      } else if (!data.session) {
-        setInfo("Account created. Check your email to confirm, then sign in.");
-        setMode("in");
+      } else {
+        qc.clear();
       }
     }
     setBusy(false);
