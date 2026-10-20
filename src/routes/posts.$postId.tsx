@@ -64,7 +64,7 @@ function PostDetail() {
         <EmptyState text="Post not found" />
       ) : (
         <>
-          <PageHeader title={post.title} subtitle={post.created_at ? `Created ${post.created_at.slice(0, 10)}` : undefined}>
+          <PageHeader title={post.title} subtitle={post.created_at ? `Created ${post.created_at.slice(0, 10)}` : ""}>
             <Button variant="outline" size="sm" onClick={() => q.refetch()} disabled={q.isFetching}>
               <RefreshCw className={`h-3.5 w-3.5 ${q.isFetching ? "animate-spin" : ""}`} /> Refresh
             </Button>
@@ -107,7 +107,7 @@ function PostDetail() {
   );
 }
 
-function Info({ name, value }: { name: string; value?: string | null }) {
+function Info({ name, value }: { name: string; value?: string | null | undefined }) {
   return (
     <div>
       <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-muted-foreground">{name}</p>
@@ -302,7 +302,10 @@ function ReviewActions({ v, onDone }: { v: PlatformVariant; onDone: () => Promis
 
   async function submit() {
     if (!mode) return;
-    if (mode !== "approve" && !feedback.trim()) return toast.error("Please add feedback");
+    if (mode !== "approve" && !feedback.trim()) {
+      toast.error("Please add feedback");
+      return;
+    }
     setBusy(true);
     try {
       await reviewPlatform({

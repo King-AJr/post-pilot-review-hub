@@ -15,7 +15,7 @@ const statusTone: Record<string, string> = {
 
 export function PlatformChip({ platform, status }: { platform: string; status: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide", statusTone[status] ?? statusTone.draft)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide", statusTone[status] ?? statusTone["draft"])}>
       {label(platform)}
       <span className="opacity-70">· {label(status)}</span>
     </span>
