@@ -25,9 +25,20 @@ export interface Post {
   ping_count?: number | null;
 }
 
-type Endpoint = "content-posts" | "content-review" | "content-ingest";
+type Endpoint =
+  | "content-posts"
+  | "content-review"
+  | "content-ingest"
+  | "content-posts-nested"
+  | "content-review-platform"
+  | "content-platform-update"
+  | "content-carousel-page-update"
+  | "content-thread-item-update"
+  | "content-video-scene-update"
+  | "content-platform-delete"
+  | "content-platform-add";
 
-async function request<T>(
+export async function request<T>(
   endpoint: Endpoint,
   opts: { method?: "GET" | "POST"; query?: Record<string, string> | undefined; body?: unknown } = {},
 ): Promise<T> {

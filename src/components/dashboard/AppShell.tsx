@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { ClipboardCheck, Factory, FilePlus2, LogOut, ShieldCheck } from "lucide-react";
+import { ClipboardCheck, Factory, LayoutList, FilePlus2, LogOut, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
 const baseNav = [
   { to: "/", label: "Review Queue", icon: ClipboardCheck },
   { to: "/production", label: "Production Queue", icon: Factory },
+  { to: "/posts", label: "All Posts", icon: LayoutList },
   { to: "/add-source", label: "Add Source", icon: FilePlus2 },
 ] as const;
 
