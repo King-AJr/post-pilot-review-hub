@@ -2,7 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const BASE = "https://divverse-community.app.n8n.cloud/webhook";
-const ENDPOINTS = ["content-posts", "content-review", "content-ingest"] as const;
+const ENDPOINTS = [
+  "content-posts",
+  "content-review",
+  "content-ingest",
+  "content-posts-nested",
+  "content-review-platform",
+  "content-platform-update",
+  "content-carousel-page-update",
+  "content-thread-item-update",
+  "content-video-scene-update",
+  "content-platform-delete",
+  "content-platform-add",
+] as const;
 type Endpoint = (typeof ENDPOINTS)[number];
 
 interface ProxyInput {
