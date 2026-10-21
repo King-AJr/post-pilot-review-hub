@@ -21,7 +21,7 @@ import { Tag } from "./Tag";
 type Mode = null | "approve" | "revise" | "reject";
 const DEFAULT_ASSIGNEE = "talk2king.aj@gmail.com";
 
-export function PostCard({ post, onDone }: { post: Post; onDone: (postId: string) => void }) {
+export function PostCard({ post, onDone, hasDetails = false }: { post: Post; onDone: (postId: string) => void; hasDetails?: boolean }) {
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [assignee, setAssignee] = useState(post.assignee_email || DEFAULT_ASSIGNEE);
@@ -74,9 +74,11 @@ export function PostCard({ post, onDone }: { post: Post; onDone: (postId: string
       </div>
 
       <h2 className="mt-3 text-base font-semibold leading-snug">{post.title}</h2>
-      <Link to="/posts/$postId" params={{ postId: String(post.post_id) }} className="mt-1 inline-block text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
-        View details →
-      </Link>
+      {hasDetails && (
+        <Link to="/posts/$postId" params={{ postId: String(post.post_id) }} className="mt-1 inline-block text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+          View details →
+        </Link>
+      )}
       <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/85">
         {post.caption}
       </p>

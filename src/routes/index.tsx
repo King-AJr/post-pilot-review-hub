@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fetchPosts, type Post } from "@/lib/api";
+import { fetchNestedPosts } from "@/lib/nested";
 import { PostCard } from "@/components/dashboard/PostCard";
 import { EmptyState, ErrorState, LoadingState, PageHeader } from "@/components/dashboard/States";
 
@@ -30,6 +31,12 @@ function ReviewQueue() {
     refetchInterval: 60_000,
     retry: 1,
   });
+  const nested = useQuery({
+    queryKey: ["nested-post-ids"],
+    queryFn: async () => new Set((await fetchNestedPosts()).filter((p) => p.platforms.length > 0).map((p) => String(p.post_id))),
+    retry: 1,
+    staleTime: 60_000,
+  });
 
   const remove = (postId: string) =>
     qc.setQueryData<Post[]>(KEY, (old) => old?.filter((p) => p.post_id !== postId));
@@ -53,7 +60,7 @@ function ReviewQueue() {
       ) : (
         <div className="space-y-4">
           {q.data.map((p) => (
-            <PostCard key={p.post_id} post={p} onDone={remove} />
+            <PostCard key={p.post_id} post={p} onDone={remove} hasDetails={nested.data?.has(String(p.post_id)) ?? false} />
           ))}
         </div>
       )}
