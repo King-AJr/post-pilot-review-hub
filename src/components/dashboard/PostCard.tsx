@@ -74,9 +74,11 @@ export function PostCard({ post, onDone, hasDetails = false }: { post: Post; onD
       </div>
 
       <h2 className="mt-3 text-base font-semibold leading-snug">{post.title}</h2>
-      <Link to="/posts/$postId" params={{ postId: String(post.post_id) }} className="mt-1 inline-block text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
-        View details →
-      </Link>
+      {hasDetails && (
+        <Link to="/posts/$postId" params={{ postId: String(post.post_id) }} className="mt-1 inline-block text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+          View details →
+        </Link>
+      )}
       <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/85">
         {post.caption}
       </p>
