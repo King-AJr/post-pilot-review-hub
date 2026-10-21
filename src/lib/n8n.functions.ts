@@ -14,6 +14,7 @@ const ENDPOINTS = [
   "content-video-scene-update",
   "content-platform-delete",
   "content-platform-add",
+  "content-platform-revisions",
 ] as const;
 type Endpoint = (typeof ENDPOINTS)[number];
 

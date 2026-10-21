@@ -95,3 +95,21 @@ export function deletePlatform(post_platform_id: string | number) {
 export function addPlatform(body: { post_id: string | number; platform: string; content_type?: string }) {
   return request<Ok>("content-platform-add", { method: "POST", body });
 }
+
+export interface PlatformRevision {
+  revision_number: number;
+  content_type?: string | null;
+  caption?: string | null;
+  hashtags?: string | null;
+  cta?: string | null;
+  media_requirements?: string | null;
+  feedback?: string | null;
+  created_at?: string | null;
+}
+
+export async function fetchPlatformRevisions(post_platform_id: string | number) {
+  const data = await request<{ revisions?: PlatformRevision[] } | null>("content-platform-revisions", {
+    query: { post_platform_id: String(post_platform_id) },
+  });
+  return data?.revisions ?? [];
+}

@@ -36,7 +36,8 @@ type Endpoint =
   | "content-thread-item-update"
   | "content-video-scene-update"
   | "content-platform-delete"
-  | "content-platform-add";
+  | "content-platform-add"
+  | "content-platform-revisions";
 
 export async function request<T>(
   endpoint: Endpoint,

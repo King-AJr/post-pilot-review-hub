@@ -17,6 +17,7 @@ import {
   updateCarouselPage, updatePlatform, updateThreadItem, updateVideoScene, type PlatformVariant,
 } from "@/lib/nested";
 import { EditableField, PlatformChip } from "@/components/dashboard/nested-ui";
+import { RevisionHistory } from "@/components/dashboard/RevisionHistory";
 import { EmptyState, ErrorState, LoadingState, PageHeader } from "@/components/dashboard/States";
 
 export const Route = createFileRoute("/posts/$postId")({
@@ -234,6 +235,7 @@ function VariantPanel({ v, onChange }: { v: PlatformVariant; onChange: () => Pro
       )}
 
       <ReviewActions v={v} onDone={onChange} />
+      <RevisionHistory variant={v} />
     </div>
   );
 }
