@@ -21,7 +21,7 @@ import { Tag } from "./Tag";
 type Mode = null | "approve" | "revise" | "reject";
 const DEFAULT_ASSIGNEE = "talk2king.aj@gmail.com";
 
-export function PostCard({ post, onDone }: { post: Post; onDone: (postId: string) => void }) {
+export function PostCard({ post, onDone, hasDetails = false }: { post: Post; onDone: (postId: string) => void; hasDetails?: boolean }) {
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [assignee, setAssignee] = useState(post.assignee_email || DEFAULT_ASSIGNEE);
