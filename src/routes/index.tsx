@@ -70,10 +70,14 @@ function ReviewQueue() {
   const isFetching = q.isFetching || nested.isFetching;
 
   const items: ReviewItem[] = [];
-  // Old-model drafts behave exactly as before — unchanged order/logic, treated as "recent"
-  // since this flat model carries no created_at we can sort by.
+  // The old-model Post type doesn't declare a created_at field, but the underlying
+  // n8n Data Table row carries one (updatedAt/createdAt) that the API passes through
+  // untyped — read it off so old and new rows interleave by real recency instead of
+  // old rows always floating to the top (or bottom).
   for (const p of q.data ?? []) {
-    items.push({ kind: "old", key: `old-${p.post_id}`, sortTime: Date.now(), post: p });
+    const raw = p as unknown as { updatedAt?: string; createdAt?: string };
+    const sortTime = Date.parse(raw.updatedAt || raw.createdAt || "") || 0;
+    items.push({ kind: "old", key: `old-${p.post_id}`, sortTime, post: p });
   }
   for (const post of nested.data ?? []) {
     const reviewable = post.platforms.filter((v) => REVIEWABLE.includes(v.status));
