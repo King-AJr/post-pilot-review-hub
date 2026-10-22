@@ -38,6 +38,7 @@ export function VariantReviewCard({
   variant,
   reviewableSiblingCount,
   onApproveAllPlatforms,
+  onReviseAllPlatforms,
   onDone,
 }: {
   post: NestedPost;
@@ -45,6 +46,7 @@ export function VariantReviewCard({
   /** Number of OTHER platform variants on this post that are also still awaiting review. */
   reviewableSiblingCount: number;
   onApproveAllPlatforms: () => Promise<void>;
+  onReviseAllPlatforms: (feedback: string) => Promise<void>;
   onDone: (post_platform_id: string | number) => void;
 }) {
   const [mode, setMode] = useState<Mode>(null);
@@ -54,6 +56,7 @@ export function VariantReviewCard({
   const [scheduled, setScheduled] = useState(variant.scheduled_date?.slice(0, 10) ?? "");
   const [feedback, setFeedback] = useState("");
   const [rejectNote, setRejectNote] = useState("");
+  const [applyToAll, setApplyToAll] = useState(false);
 
   async function submit(action: "approve" | "revise" | "reject") {
     setBusy(true);
@@ -77,6 +80,28 @@ export function VariantReviewCard({
       );
       setMode(null);
       onDone(variant.post_platform_id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitRevise() {
+    if (!feedback.trim()) return;
+    setBusy(true);
+    try {
+      if (applyToAll) {
+        await onReviseAllPlatforms(feedback.trim());
+        toast.success(`Revision requested for all ${reviewableSiblingCount + 1} platforms`);
+      } else {
+        await reviewPlatform({ post_platform_id: variant.post_platform_id, action: "revise", feedback: feedback.trim() });
+        toast.success("Revision requested — the rewrite will appear on a later refresh");
+        onDone(variant.post_platform_id);
+      }
+      setMode(null);
+      setFeedback("");
+      setApplyToAll(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Action failed");
     } finally {
@@ -159,7 +184,9 @@ export function VariantReviewCard({
 
       {mode === "revise" && (
         <div className="mt-4 space-y-2 rounded-md bg-muted p-3">
-          <Label htmlFor={`vf-${variant.post_platform_id}`} className="text-xs">What should change on {label(variant.platform)}?</Label>
+          <Label htmlFor={`vf-${variant.post_platform_id}`} className="text-xs">
+            What should change {applyToAll ? "on every platform" : `on ${label(variant.platform)}`}?
+          </Label>
           <Textarea
             id={`vf-${variant.post_platform_id}`}
             rows={3}
@@ -169,12 +196,24 @@ export function VariantReviewCard({
             className="bg-card"
             disabled={busy}
           />
+          {reviewableSiblingCount > 0 && (
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={applyToAll}
+                onChange={(e) => setApplyToAll(e.target.checked)}
+                disabled={busy}
+                className="h-3.5 w-3.5"
+              />
+              Apply this same feedback to all {reviewableSiblingCount + 1} platforms for this post, not just {label(variant.platform)}
+            </label>
+          )}
           <div className="flex items-center gap-2">
-            <Button size="sm" onClick={() => submit("revise")} disabled={busy || !feedback.trim()}>
+            <Button size="sm" onClick={submitRevise} disabled={busy || !feedback.trim()}>
               {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              {busy ? "Rewriting…" : "Send for revision"}
+              {busy ? "Rewriting…" : applyToAll ? `Send for revision on all ${reviewableSiblingCount + 1} platforms` : "Send for revision"}
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setMode(null)} disabled={busy}>Cancel</Button>
+            <Button size="sm" variant="ghost" onClick={() => { setMode(null); setApplyToAll(false); }} disabled={busy}>Cancel</Button>
             {busy && <span className="text-xs text-muted-foreground">The AI rewrite can take a few seconds.</span>}
           </div>
         </div>

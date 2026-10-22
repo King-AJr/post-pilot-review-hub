@@ -64,6 +64,12 @@ function ReviewQueue() {
     );
   };
 
+  const reviseAllPlatforms = async (variantIds: (string | number)[], feedback: string) => {
+    await Promise.all(variantIds.map((id) => reviewPlatform({ post_platform_id: id, action: "revise", feedback })));
+    // Same contract as a single revise: drop the rows now, the rewrite reappears on the next refetch.
+    variantIds.forEach((id) => removeVariant(id));
+  };
+
   const isPending = q.isPending || nested.isPending;
   const isError = q.isError || nested.isError;
   const errorMessage = q.error?.message || nested.error?.message || "Something went wrong";
@@ -140,6 +146,7 @@ function ReviewQueue() {
                 variant={item.variant}
                 reviewableSiblingCount={item.reviewableSiblingIds.length}
                 onApproveAllPlatforms={() => approveAllPlatforms(item.post, [item.variant.post_platform_id, ...item.reviewableSiblingIds])}
+                onReviseAllPlatforms={(feedback) => reviseAllPlatforms([item.variant.post_platform_id, ...item.reviewableSiblingIds], feedback)}
                 onDone={removeVariant}
               />
             ),
